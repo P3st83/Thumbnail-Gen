@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thumbnail Generator</title>
+  <style>
+    :root {
+      --bg-color: #1e1e2e;
+      --card-bg: #2a2a3c;
+      --text-color: #e2e2e2;
+      --text-secondary: #a6a6b8;
+      --primary-color: #6d8eff;
+      --primary-hover: #5a75e5;
+      --success-color: #50fa7b;
+      --danger-color: #ff5555;
+      --border-color: #444455;
+      --shadow-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      font-family: system-ui, -apple-system, sans-serif; 
+      padding: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+    
+    h2, h3, h4 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      margin-bottom: 1.2rem;
+      color: var(--text-secondary);
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 5px 15px var(--shadow-color);
+      padding: 25px;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px var(--shadow-color);
+    }
+    
+    .btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      font-size: 16px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    .btn:disabled {
+      background: #4a5b99;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    
+    .btn-success {
+      background: var(--success-color);
+      color: #000;
+    }
+    
+    .btn-success:hover {
+      background: #3ad066;
+    }
+    
+    input[type="file"] {
+      background: #373748;
+      margin-right: 10px;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-color);
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    
+    input[type="text"] {
+      padding: 12px;
+      font-size: 16px;
+      background: #373748;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-color);
+      margin-right: 10px;
+      margin-bottom: 15px;
+      width: 100%;
+    }
+    
+    input[type="text"]:focus, input[type="file"]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(109, 142, 255, 0.2);
+    }
+    
+    img { 
+      max-width: 200px; 
+      height: auto;
+      margin: 10px; 
+      cursor: pointer; 
+      border: 3px solid transparent; 
+      transition: all 0.3s;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px var(--shadow-color);
+    }
+    
+    img:hover { 
+      transform: scale(1.05); 
+      box-shadow: 0 5px 15px var(--shadow-color);
+    }
+    
+    img.selected { 
+      border: 3px solid var(--primary-color); 
+      box-shadow: 0 0 0 2px rgba(109, 142, 255, 0.5);
+    }
+    
+    .frame-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+    
+    .loading {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 10px;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(109, 142, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .result-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px var(--shadow-color);
+      margin: 25px 0;
+      display: block;
+    }
+    
+    .download-link {
+      display: inline-block;
+      background: var(--success-color);
+      color: #000;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.1s;
+    }
+    
+    .download-link:hover {
+      background: #3ad066;
+      transform: translateY(-2px);
+    }
+    
+    .error {
+      color: var(--danger-color);
+      background: rgba(255, 85, 85, 0.1);
+      padding: 12px;
+      border-radius: 6px;
+      margin: 15px 0;
+      border-left: 4px solid var(--danger-color);
+    }
+    
+    .success {
+      color: var(--success-color);
+      background: rgba(80, 250, 123, 0.1);
+      padding: 12px;
+      border-radius: 6px;
+      margin: 15px 0;
+      border-left: 4px solid var(--success-color);
+    }
+    
+    .form-row {
+      margin-bottom: 15px;
+    }
+    
+    .enhancement-options {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+      gap: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 8px;
+    }
+    
+    .option-column {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .option-column h4 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+    
+    .option-column ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .option-column li {
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .option-column strong {
+      color: var(--text-color);
+      background: rgba(109, 142, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    
+    .centered {
+      text-align: center;
+    }
+    
+    .step-number {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      input[type="text"], input[type="file"], .btn {
+        width: 100%;
+        margin-right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎬 Video Thumbnail Generator</h1>
+      <p>Extract frames from your videos and enhance them with professional effects</p>
+    </header>
+    
+    <div class="card" id="uploadCard">
+      <h2><span class="step-number">1</span> Upload Video</h2>
+      <p>Select a video file to extract frames from</p>
+      
+      <div class="form-row">
+        <input type="file" id="videoInput" accept="video/*" />
+      </div>
+      
+      <button id="uploadBtn" class="btn" onclick="uploadVideo()">Upload & Extract Frames</button>
+      <div id="uploadStatus"></div>
+    </div>
+    
+    <div id="framesContainer" class="card hidden">
+      <h2><span class="step-number">2</span> Select a Frame</h2>
+      <p>Click on one of the frames extracted from your video:</p>
+      <div id="frames" class="frame-gallery"></div>
+    </div>
+    
+    <div id="enhanceSection" class="card hidden">
+      <h2><span class="step-number">3</span> Enhance Your Thumbnail</h2>
+      <p>Enter a keyword to apply specific enhancements:</p>
+      
+      <div class="enhancement-options">
+        <div class="option-column">
+          <h4>Basic Adjustments</h4>
+          <ul>
+            <li><strong>brighten</strong> Makes the image brighter</li>
+            <li><strong>contrast</strong> Increases contrast and vividness</li>
+            <li><strong>sharpen</strong> Makes details clearer and sharper</li>
+            <li><strong>saturate</strong> Increases color saturation and vibrancy</li>
+            <li><strong>blur</strong> Applies a soft blur effect</li>
+          </ul>
+        </div>
+        
+        <div class="option-column">
+          <h4>Color Effects</h4>
+          <ul>
+            <li><strong>grayscale</strong> Converts to black and white</li>
+            <li><strong>sepia</strong> Applies a vintage/sepia effect</li>
+            <li><strong>cool</strong> Adds a cool/blue tone</li>
+            <li><strong>warm</strong> Adds a warm/orange tone</li>
+            <li><strong>invert</strong> Creates a negative image effect</li>
+          </ul>
+        </div>
+        
+        <div class="option-column">
+          <h4>Stylistic Effects</h4>
+          <ul>
+            <li><strong>hd</strong> High-definition enhancement</li>
+            <li><strong>dramatic</strong> High contrast with deep shadows</li>
+            <li><strong>posterize</strong> Creates a poster/comic art effect</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <input type="text" id="promptInput" placeholder="Enter enhancement keyword (e.g. sharpen, warm, hd)" />
+      </div>
+      
+      <button id="enhanceBtn" class="btn" onclick="enhance()">Enhance Selected Frame</button>
+      <div id="enhanceStatus"></div>
+      <div id="resultThumb" class="centered"></div>
+    </div>
+  </div>
+  
+  <script>
+    let selectedFrameUrl = "";
+
+    async function uploadVideo() {
+      const videoInput = document.getElementById("videoInput");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const uploadStatus = document.getElementById("uploadStatus");
+      const framesContainer = document.getElementById("framesContainer");
+      
+      if (!videoInput.files.length) {
+        return showError(uploadStatus, "Please select a video file first.");
+      }
+      
+      // Show loading indicator
+      uploadBtn.disabled = true;
+      uploadStatus.innerHTML = '<div class="spinner"></div><span class="loading">Uploading video and extracting frames... This may take a moment.</span>';
+      
+      const formData = new FormData();
+      formData.append("video", videoInput.files[0]);
+      
+      try {
+        const res = await fetch("/upload", { 
+          method: "POST", 
+          body: formData 
+        });
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          showError(uploadStatus, `Upload failed: ${errorText}`);
+          uploadBtn.disabled = false;
+          return;
+        }
+        
+        const data = await res.json();
+        
+        if (!data.frames || data.frames.length === 0) {
+          showError(uploadStatus, "No frames were extracted. Try a different video file.");
+          uploadBtn.disabled = false;
+          return;
+        }
+        
+        // Display the frames
+        const framesDiv = document.getElementById("frames");
+        framesDiv.innerHTML = "";
+        
+        data.frames.forEach((url) => {
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = "Video frame";
+          img.onclick = () => {
+            document.querySelectorAll("img").forEach(i => i.classList.remove("selected"));
+            img.classList.add("selected");
+            selectedFrameUrl = url;
+            document.getElementById("enhanceSection").classList.remove("hidden");
+            // Scroll to enhancement section
+            document.getElementById("enhanceSection").scrollIntoView({behavior: "smooth"});
+          };
+          framesDiv.appendChild(img);
+        });
+        
+        framesContainer.classList.remove("hidden");
+        showSuccess(uploadStatus, `Successfully extracted ${data.frames.length} frames`);
+        
+        // Scroll to frames section
+        framesContainer.scrollIntoView({behavior: "smooth"});
+      } catch (error) {
+        console.error("Error uploading video:", error);
+        showError(uploadStatus, `Error: ${error.message || "Failed to upload video"}`);
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    }
+
+    async function enhance() {
+      const prompt = document.getElementById("promptInput").value.trim();
+      const enhanceBtn = document.getElementById("enhanceBtn");
+      const enhanceStatus = document.getElementById("enhanceStatus");
+      const resultThumb = document.getElementById("resultThumb");
+      
+      if (!selectedFrameUrl) {
+        return showError(enhanceStatus, "Please select a frame first.");
+      }
+      
+      // Show loading indicator
+      enhanceBtn.disabled = true;
+      enhanceStatus.innerHTML = '<div class="spinner"></div><span class="loading">Enhancing image... This may take a few seconds.</span>';
+      resultThumb.innerHTML = '';
+      
+      try {
+        const res = await fetch("/enhance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageUrl: selectedFrameUrl, prompt }),
+        });
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          showError(enhanceStatus, `Enhancement failed: ${errorText}`);
+          enhanceBtn.disabled = false;
+          return;
+        }
+        
+        const data = await res.json();
+        
+        // Add a timestamp parameter to prevent browser caching
+        const cachedUrl = data.enhanced + '?t=' + new Date().getTime();
+        
+        resultThumb.innerHTML = `
+          <h3>✅ Enhanced Thumbnail</h3>
+          <img src="${cachedUrl}" class="result-image" alt="Enhanced thumbnail" />
+          <div>
+            <a href="${data.enhanced}" download="enhanced_thumbnail.jpg" class="download-link">Download Thumbnail</a>
+          </div>
+        `;
+        
+        showSuccess(enhanceStatus, data.message || "Image enhanced successfully");
+        
+        // Scroll to result
+        resultThumb.scrollIntoView({behavior: "smooth"});
+      } catch (error) {
+        console.error("Error enhancing image:", error);
+        showError(enhanceStatus, `Error: ${error.message || "Failed to enhance image"}`);
+      } finally {
+        enhanceBtn.disabled = false;
+      }
+    }
+    
+    function showError(element, message) {
+      element.innerHTML = `<div class="error">${message}</div>`;
+    }
+    
+    function showSuccess(element, message) {
+      element.innerHTML = `<div class="success">${message}</div>`;
+    }
+  </script>
+</body>
+</html>
