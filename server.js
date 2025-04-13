@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -125,6 +124,15 @@ app.post('/enhance', async (req, res) => {
     const fullImagePath = path.join(__dirname, 'frames', imagePath);
     
     console.log("Reading image from file:", fullImagePath);
+    
+    // Read the image file directly
+    let imageBuffer;
+    try {
+      imageBuffer = fs.readFileSync(fullImagePath);
+    } catch (err) {
+      console.error("Error reading image file:", err);
+      return res.status(500).send(`Could not read image file: ${err.message}`);
+    }
     
     // Create timestamp and define output path
     const timestamp = Date.now();

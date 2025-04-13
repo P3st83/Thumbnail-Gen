@@ -413,7 +413,6 @@
         return showError(uploadStatus, "Please select a video file first.");
       }
       
-      // Show loading indicator
       uploadBtn.disabled = true;
       uploadStatus.innerHTML = '<div class="spinner"></div><span class="loading">Uploading video and extracting frames... This may take a moment.</span>';
       
@@ -441,7 +440,6 @@
           return;
         }
         
-        // Display the frames
         const framesDiv = document.getElementById("frames");
         framesDiv.innerHTML = "";
         
@@ -454,7 +452,6 @@
             img.classList.add("selected");
             selectedFrameUrl = url;
             document.getElementById("enhanceSection").classList.remove("hidden");
-            // Scroll to enhancement section
             document.getElementById("enhanceSection").scrollIntoView({behavior: "smooth"});
           };
           framesDiv.appendChild(img);
@@ -463,7 +460,6 @@
         framesContainer.classList.remove("hidden");
         showSuccess(uploadStatus, `Successfully extracted ${data.frames.length} frames`);
         
-        // Scroll to frames section
         framesContainer.scrollIntoView({behavior: "smooth"});
       } catch (error) {
         console.error("Error uploading video:", error);
@@ -483,7 +479,6 @@
         return showError(enhanceStatus, "Please select a frame first.");
       }
       
-      // Show loading indicator
       enhanceBtn.disabled = true;
       enhanceStatus.innerHTML = '<div class="spinner"></div><span class="loading">Enhancing image... This may take a few seconds.</span>';
       resultThumb.innerHTML = '';
@@ -504,7 +499,6 @@
         
         const data = await res.json();
         
-        // Add a timestamp parameter to prevent browser caching
         const cachedUrl = data.enhanced + '?t=' + new Date().getTime();
         
         resultThumb.innerHTML = `
@@ -517,7 +511,6 @@
         
         showSuccess(enhanceStatus, data.message || "Image enhanced successfully");
         
-        // Scroll to result
         resultThumb.scrollIntoView({behavior: "smooth"});
       } catch (error) {
         console.error("Error enhancing image:", error);
