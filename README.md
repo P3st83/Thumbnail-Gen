@@ -1,46 +1,42 @@
 # Thumbnail Generator
 
-A simple web application to extract frames from videos and enhance them to create professional thumbnails.
+A simple web application to extract frames from videos and enhance them to create professional thumbnails with sports broadcast styling.
 
 ## Features
 
 - Extract multiple frames evenly distributed throughout your video
 - Select your preferred frame to use as a thumbnail
-- Apply various enhancement effects to improve your thumbnail
-- Download in high resolution (1280x720 or larger)
+- Apply various enhancement effects and broadcasting overlay templates
+- Download in high resolution (1280x720)
 - Works 100% offline - no internet connection needed
 
 ## Enhancement Options
 
-The app offers several enhancement options:
+The app offers several enhancement styles:
 
-### Basic Adjustments
-- **brighten**: Makes the image brighter
-- **contrast**: Increases contrast and vividness
-- **sharpen**: Makes details clearer and sharper
-- **saturate**: Increases color saturation and vibrancy
-- **blur**: Applies a soft blur effect
+### Sports Broadcasting Templates
+- **10 in 7 Record**: Blue sidebar with "GET 'EM INSIDE" logo and "10 IN 7" headline
+- **Race 8**: Racing broadcast style with price box
+- **Debut Winner**: Elegant overlay with transparent blue effect
+- **Simon Marshall**: Breaking news style with red header and ticker bar
+- **Odds**: Large odds display with GETON branding
+- **Sword**: Transparent overlay with "PUT 'EM TO THE SWORD" text
+- **Same Game**: NRL style with "SAME GAME MULTI" footer
 
-### Color Effects
-- **grayscale**: Converts to black and white
-- **sepia**: Applies a vintage/sepia effect
-- **cool**: Adds a cool/blue tone
-- **warm**: Adds a warm/orange tone
-- **invert**: Creates a negative image effect
-
-### Stylistic Effects
-- **hd**: High-definition enhancement
-- **dramatic**: High contrast with deep shadows
-- **posterize**: Creates a poster/comic art effect
+Each template includes:
+- Broadcasting-quality overlays
+- Professional typography
+- Timer display (0:44)
+- Proper branding elements
 
 ## Installation
 
 1. Clone the repository
 2. Install dependencies:
    ```
-   npm install express multer sharp axios dotenv
+   npm install
    ```
-   This will install:
+   This will install all required packages including:
    - **express**: Web server framework
    - **multer**: File upload handling
    - **sharp**: Image processing library
@@ -58,12 +54,12 @@ The app offers several enhancement options:
 
 2. You should see this output:
    ```
-   🚀 Server running at http://localhost:3000
+   🚀 Server running at http://localhost:3001
    ```
 
 3. Open your browser and navigate to:
    ```
-   http://localhost:3000
+   http://localhost:3001
    ```
 
 4. If you want to run the server on a different port, you can change the `port` variable in `server.js`
@@ -80,17 +76,17 @@ The app offers several enhancement options:
 
 ## How to Use
 
-1. **Upload a Video**: Click on the file input and select a video file
-2. **Extract Frames**: Click "Upload & Extract Frames" to process the video
+1. **Upload a Video**: Click on the file input and select a video file (mp4, mov, avi, mkv, webm)
+2. **Extract Frames**: Click "Upload Video" to process the video
 3. **Select a Frame**: Browse through the extracted frames and click on one to select it
-4. **Apply Enhancement**: Enter a keyword like "sharpen" or "dramatic" in the input field
-5. **Enhance the Frame**: Click "Enhance Selected Frame" to apply the effect
+4. **Choose a Style**: Select one of the broadcasting style templates
+5. **Enhance the Frame**: The selected template will be applied to your frame
 6. **Download**: Click "Download Thumbnail" to save your enhanced image
 
 ## Technologies Used
 
 ### Frontend
-- **HTML/CSS/JavaScript**: Simple responsive interface
+- **HTML/CSS/JavaScript**: Dark-themed responsive interface
 - **Modern CSS**: Flexbox-based layout for the enhancement options
 - **Client-side JavaScript**: Handles file upload, frame selection, and enhancement requests
 
@@ -98,12 +94,11 @@ The app offers several enhancement options:
 - **Express.js**: Fast, unopinionated web framework for Node.js
 - **Multer**: Middleware for handling multipart/form-data, primarily used for uploading files
 - **FFmpeg**: Cross-platform solution to record, convert, and stream audio and video
-  - Uses the `thumbnail` filter to extract representative frames from videos
-  - Can extract up to hundreds of frames from longer videos
+  - Extracts frames at a rate of 4 frames per second
+  - Validates video files to ensure they contain video streams
 - **Sharp**: High-performance Node.js image processing library
-  - 4-8x faster than using ImageMagick or GraphicsMagick
-  - Low memory footprint
-  - Supports various image manipulations (brightness, contrast, etc.)
+  - Creates professional overlays using SVG templates
+  - Composites images with text and graphical elements
   - Automatically handles image format conversion and optimization
 
 ## Performance

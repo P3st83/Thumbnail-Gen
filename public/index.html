@@ -1,532 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thumbnail Generator</title>
-  <style>
-    :root {
-      --bg-color: #1e1e2e;
-      --card-bg: #2a2a3c;
-      --text-color: #e2e2e2;
-      --text-secondary: #a6a6b8;
-      --primary-color: #6d8eff;
-      --primary-hover: #5a75e5;
-      --success-color: #50fa7b;
-      --danger-color: #ff5555;
-      --border-color: #444455;
-      --shadow-color: rgba(0, 0, 0, 0.4);
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body { 
-      font-family: system-ui, -apple-system, sans-serif; 
-      padding: 0;
-      background: var(--bg-color);
-      color: var(--text-color);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    header {
-      text-align: center;
-      padding: 2rem 0;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 2rem;
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      color: var(--primary-color);
-    }
-    
-    h2, h3, h4 {
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
-    
-    p {
-      margin-bottom: 1.2rem;
-      color: var(--text-secondary);
-    }
-    
-    .card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: 0 5px 15px var(--shadow-color);
-      padding: 25px;
-      margin-bottom: 2rem;
-      border: 1px solid var(--border-color);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px var(--shadow-color);
-    }
-    
-    .btn {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      font-size: 16px;
-      font-weight: 600;
-      display: inline-block;
-    }
-    
-    .btn:hover {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-    }
-    
-    .btn:active {
-      transform: translateY(1px);
-    }
-    
-    .btn:disabled {
-      background: #4a5b99;
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-    
-    .btn-success {
-      background: var(--success-color);
-      color: #000;
-    }
-    
-    .btn-success:hover {
-      background: #3ad066;
-    }
-    
-    input[type="file"] {
-      background: #373748;
-      margin-right: 10px;
-      padding: 8px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      color: var(--text-color);
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    
-    input[type="text"] {
-      padding: 12px;
-      font-size: 16px;
-      background: #373748;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      color: var(--text-color);
-      margin-right: 10px;
-      margin-bottom: 15px;
-      width: 100%;
-    }
-    
-    input[type="text"]:focus, input[type="file"]:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(109, 142, 255, 0.2);
-    }
-    
-    img { 
-      max-width: 200px; 
-      height: auto;
-      margin: 10px; 
-      cursor: pointer; 
-      border: 3px solid transparent; 
-      transition: all 0.3s;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px var(--shadow-color);
-    }
-    
-    img:hover { 
-      transform: scale(1.05); 
-      box-shadow: 0 5px 15px var(--shadow-color);
-    }
-    
-    img.selected { 
-      border: 3px solid var(--primary-color); 
-      box-shadow: 0 0 0 2px rgba(109, 142, 255, 0.5);
-    }
-    
-    .frame-gallery {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      margin: 1.5rem 0;
-    }
-    
-    .loading {
-      display: inline-flex;
-      align-items: center;
-      margin-left: 10px;
-      font-style: italic;
-      color: var(--text-secondary);
-    }
-    
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(109, 142, 255, 0.2);
-      border-radius: 50%;
-      border-top-color: var(--primary-color);
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 10px;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .result-image {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 8px 25px var(--shadow-color);
-      margin: 25px 0;
-      display: block;
-    }
-    
-    .download-link {
-      display: inline-block;
-      background: var(--success-color);
-      color: #000;
-      text-decoration: none;
-      padding: 12px 20px;
-      border-radius: 6px;
-      margin-top: 20px;
-      font-weight: 600;
-      transition: background 0.2s, transform 0.1s;
-    }
-    
-    .download-link:hover {
-      background: #3ad066;
-      transform: translateY(-2px);
-    }
-    
-    .error {
-      color: var(--danger-color);
-      background: rgba(255, 85, 85, 0.1);
-      padding: 12px;
-      border-radius: 6px;
-      margin: 15px 0;
-      border-left: 4px solid var(--danger-color);
-    }
-    
-    .success {
-      color: var(--success-color);
-      background: rgba(80, 250, 123, 0.1);
-      padding: 12px;
-      border-radius: 6px;
-      margin: 15px 0;
-      border-left: 4px solid var(--success-color);
-    }
-    
-    .form-row {
-      margin-bottom: 15px;
-    }
-    
-    .enhancement-options {
-      display: flex;
-      flex-wrap: wrap;
-      margin-bottom: 25px;
-      gap: 20px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      border-radius: 8px;
-    }
-    
-    .option-column {
-      flex: 1;
-      min-width: 200px;
-    }
-    
-    .option-column h4 {
-      margin-top: 0;
-      margin-bottom: 15px;
-      color: var(--primary-color);
-      font-size: 1.1rem;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 8px;
-    }
-    
-    .option-column ul {
-      list-style-type: none;
-      padding-left: 0;
-      margin: 0;
-    }
-    
-    .option-column li {
-      margin-bottom: 12px;
-      color: var(--text-secondary);
-    }
-    
-    .option-column strong {
-      color: var(--text-color);
-      background: rgba(109, 142, 255, 0.1);
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-right: 5px;
-    }
-    
-    .centered {
-      text-align: center;
-    }
-    
-    .step-number {
-      display: inline-block;
-      width: 30px;
-      height: 30px;
-      background: var(--primary-color);
-      color: white;
-      border-radius: 50%;
-      text-align: center;
-      line-height: 30px;
-      margin-right: 10px;
-      font-weight: bold;
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-      
-      .card {
-        padding: 15px;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
-      input[type="text"], input[type="file"], .btn {
-        width: 100%;
-        margin-right: 0;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Thumbnail Generator</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1b26;
+            color: #a9b1d6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #7aa2f7;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #787c99;
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: #24283b;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #7aa2f7;
+            color: #1a1b26;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        h2 {
+            color: #7aa2f7;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .upload-section {
+            text-align: center;
+            border: 2px dashed #34385e;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: #7aa2f7;
+            color: #1a1b26;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: #5d7ce6;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+
+        #frames-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .frame {
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .frame:hover {
+            transform: scale(1.05);
+        }
+
+        .frame.selected {
+            border: 3px solid #7aa2f7;
+        }
+
+        .frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        #result {
+            text-align: center;
+        }
+
+        #result img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            color: #9ece6a;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        .error-message {
+            color: #f7768e;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .styles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .style-option {
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #2a2f45;
+            transition: transform 0.2s;
+        }
+        
+        .style-option:hover {
+            transform: scale(1.05);
+        }
+        
+        .style-option.selected {
+            border: 3px solid #7aa2f7;
+        }
+        
+        .style-preview {
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .race8-preview {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDA2NmNjIi8+PHRleHQgeD0iMTAiIHk9IjE1IiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+R0VUPHRzcGFuIGZpbGw9IiNmZmNjMDAiPk9OPC90c3Bhbj48L3RleHQ+PHRleHQgeD0iMTAiIHk9IjUwIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iYm9sZCI+UkFDRSA4PC90ZXh0PjxyZWN0IHg9IjEwIiB5PSI2MCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZjYzAwIiByeD0iMiIvPjx0ZXh0IHg9IjIwIiB5PSI3NSIgZmlsbD0iYmxhY2siIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPiQyNi4wMDwvdGV4dD48L3N2Zz4=');
+        }
+        
+        .debut-winner-preview {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgcng9IjUiIHJ5PSI1IiBmaWxsPSIjMDA2NmNjIi8+PHRleHQgeD0iMTAiIHk9IjIwIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+R0VUPHRzcGFuIGZpbGw9IiNmZmNjMDAiPk9OPC90c3Bhbj48L3RleHQ+PHRleHQgeD0iMTAiIHk9IjkwIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+IkRFQlVUIFdJTk5FUiI8L3RleHQ+PHJlY3QgeD0iMTAiIHk9IjkzIiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIGZpbGw9IiNmZmNjMDAiIHJ4PSIyIi8+PHRleHQgeD0iMjAiIHk9IjEwOCIgZmlsbD0iYmxhY2siIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPiQzLjIwPC90ZXh0Pjwvc3ZnPg==');
+        }
+        
+        .simon-marshall-preview {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjY2MwMDAwIi8+PHRleHQgeD0iMTAiIHk9IjE1IiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+QlJFQUtJTkcgTkVXUzwvdGV4dD48cmVjdCB5PSI5MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzAwMDAwMCIvPjxyZWN0IHk9IjkwIiB3aWR0aD0iNjAiIGhlaWdodD0iMzAiIGZpbGw9IiNjYzAwMDAiLz48dGV4dCB4PSIxMCIgeT0iMTEwIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+RVhDTFVTSVZFPC90ZXh0Pjwvc3ZnPg==');
+        }
+        
+        .ten-in-seven-preview {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIxMDAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTIwIiBmaWxsPSIjMDA2NmNjIi8+PHRleHQgeD0iMTQwIiB5PSI0MCIgZmlsbD0iI2ZmY2MwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MTAgSU4gNy48L3RleHQ+PHRleHQgeD0iMTQwIiB5PSI2MCIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI3IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VU5CRUxJRVZBQkxFPC90ZXh0Pjx0ZXh0IHg9IjE0MCIgeT0iNzAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNyIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlJFQ09SRDwvdGV4dD48L3N2Zz4=');
+        }
+        
+        .odds-preview {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGV4dCB4PSIxMCIgeT0iMjAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5HRVQ8dHNwYW4gZmlsbD0iI2ZmY2MwMCI+T048L3RzcGFuPjwvdGV4dD48dGV4dCB4PSIxMCIgeT0iNjAiIGZpbGw9IiNmZmNjMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIzMCIgZm9udC13ZWlnaHQ9ImJvbGQiPiQyNjwvdGV4dD48dGV4dCB4PSIxMCIgeT0iOTAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5PRERTIC0gPC90ZXh0Pjwvc3ZnPg==');
+        }
+        
+        .sword-preview {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgcng9IjUiIHJ5PSI1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMikiLz48dGV4dCB4PSIxMCIgeT0iMjAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5HRVQ8dHNwYW4gZmlsbD0iI2ZmY2MwMCI+T048L3RzcGFuPjwvdGV4dD48dGV4dCB4PSIxMCIgeT0iMTEwIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSJib2xkIj4iUFVUICdFTSBUTyBUSEUgU1dPUkQiPC90ZXh0Pjwvc3ZnPg==');
+        }
+        
+        .same-game-preview {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxNSIgcng9IjIiIGZpbGw9IiMwMDMzYWEiLz48dGV4dCB4PSIyNSIgeT0iMjAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5STDwvdGV4dD48cmVjdCB5PSIxMDAiIHdpZHRoPSI5MCIgaGVpZ2h0PSIyMCIgcng9IjMiIGZpbGw9IiMwMDY2Y2MiLz48cmVjdCB4PSI3MCIgeT0iMTAwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjIwIiByeD0iMCIgZmlsbD0iI2ZmY2MwMCIvPjx0ZXh0IHg9IjM1IiB5PSIxMTUiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiPkdFVCAnRU0gSU5TSURF8J+YjjwvdGV4dD48dGV4dCB4PSIxMzAiIHk9IjExNSIgZmlsbD0iIzAwNjZjYyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjgiIGZvbnQtd2VpZ2h0PSJib2xkIj5TQU1FIEdBTUUgTVVMVEk8L3RleHQ+PC9zdmc+');
+        }
+        
+        .style-option span {
+            display: block;
+            padding: 10px;
+            text-align: center;
+            color: #a9b1d6;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎬 Video Thumbnail Generator</h1>
-      <p>Extract frames from your videos and enhance them with professional effects</p>
-    </header>
-    
-    <div class="card" id="uploadCard">
-      <h2><span class="step-number">1</span> Upload Video</h2>
-      <p>Select a video file to extract frames from</p>
-      
-      <div class="form-row">
-        <input type="file" id="videoInput" accept="video/*" />
-      </div>
-      
-      <button id="uploadBtn" class="btn" onclick="uploadVideo()">Upload & Extract Frames</button>
-      <div id="uploadStatus"></div>
-    </div>
-    
-    <div id="framesContainer" class="card hidden">
-      <h2><span class="step-number">2</span> Select a Frame</h2>
-      <p>Click on one of the frames extracted from your video:</p>
-      <div id="frames" class="frame-gallery"></div>
-    </div>
-    
-    <div id="enhanceSection" class="card hidden">
-      <h2><span class="step-number">3</span> Enhance Your Thumbnail</h2>
-      <p>Enter a keyword to apply specific enhancements:</p>
-      
-      <div class="enhancement-options">
-        <div class="option-column">
-          <h4>Basic Adjustments</h4>
-          <ul>
-            <li><strong>brighten</strong> Makes the image brighter</li>
-            <li><strong>contrast</strong> Increases contrast and vividness</li>
-            <li><strong>sharpen</strong> Makes details clearer and sharper</li>
-            <li><strong>saturate</strong> Increases color saturation and vibrancy</li>
-            <li><strong>blur</strong> Applies a soft blur effect</li>
-          </ul>
+    <div class="container">
+        <div class="header">
+            <h1>📹 Video Thumbnail Generator</h1>
+            <p>Extract frames from your videos and enhance them with professional effects</p>
         </div>
-        
-        <div class="option-column">
-          <h4>Color Effects</h4>
-          <ul>
-            <li><strong>grayscale</strong> Converts to black and white</li>
-            <li><strong>sepia</strong> Applies a vintage/sepia effect</li>
-            <li><strong>cool</strong> Adds a cool/blue tone</li>
-            <li><strong>warm</strong> Adds a warm/orange tone</li>
-            <li><strong>invert</strong> Creates a negative image effect</li>
-          </ul>
-        </div>
-        
-        <div class="option-column">
-          <h4>Stylistic Effects</h4>
-          <ul>
-            <li><strong>hd</strong> High-definition enhancement</li>
-            <li><strong>dramatic</strong> High contrast with deep shadows</li>
-            <li><strong>posterize</strong> Creates a poster/comic art effect</li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <input type="text" id="promptInput" placeholder="Enter enhancement keyword (e.g. sharpen, warm, hd)" />
-      </div>
-      
-      <button id="enhanceBtn" class="btn" onclick="enhance()">Enhance Selected Frame</button>
-      <div id="enhanceStatus"></div>
-      <div id="resultThumb" class="centered"></div>
-    </div>
-  </div>
-  
-  <script>
-    let selectedFrameUrl = "";
 
-    async function uploadVideo() {
-      const videoInput = document.getElementById("videoInput");
-      const uploadBtn = document.getElementById("uploadBtn");
-      const uploadStatus = document.getElementById("uploadStatus");
-      const framesContainer = document.getElementById("framesContainer");
-      
-      if (!videoInput.files.length) {
-        return showError(uploadStatus, "Please select a video file first.");
-      }
-      
-      uploadBtn.disabled = true;
-      uploadStatus.innerHTML = '<div class="spinner"></div><span class="loading">Uploading video and extracting frames... This may take a moment.</span>';
-      
-      const formData = new FormData();
-      formData.append("video", videoInput.files[0]);
-      
-      try {
-        const res = await fetch("/upload", { 
-          method: "POST", 
-          body: formData 
-        });
-        
-        if (!res.ok) {
-          const errorText = await res.text();
-          showError(uploadStatus, `Upload failed: ${errorText}`);
-          uploadBtn.disabled = false;
-          return;
-        }
-        
-        const data = await res.json();
-        
-        if (!data.frames || data.frames.length === 0) {
-          showError(uploadStatus, "No frames were extracted. Try a different video file.");
-          uploadBtn.disabled = false;
-          return;
-        }
-        
-        const framesDiv = document.getElementById("frames");
-        framesDiv.innerHTML = "";
-        
-        data.frames.forEach((url) => {
-          const img = document.createElement("img");
-          img.src = url;
-          img.alt = "Video frame";
-          img.onclick = () => {
-            document.querySelectorAll("img").forEach(i => i.classList.remove("selected"));
-            img.classList.add("selected");
-            selectedFrameUrl = url;
-            document.getElementById("enhanceSection").classList.remove("hidden");
-            document.getElementById("enhanceSection").scrollIntoView({behavior: "smooth"});
-          };
-          framesDiv.appendChild(img);
-        });
-        
-        framesContainer.classList.remove("hidden");
-        showSuccess(uploadStatus, `Successfully extracted ${data.frames.length} frames`);
-        
-        framesContainer.scrollIntoView({behavior: "smooth"});
-      } catch (error) {
-        console.error("Error uploading video:", error);
-        showError(uploadStatus, `Error: ${error.message || "Failed to upload video"}`);
-      } finally {
-        uploadBtn.disabled = false;
-      }
-    }
+        <div class="card">
+            <h2><span class="step-number">1</span>Upload Video</h2>
+            <div class="upload-section">
+                <input type="file" id="video" accept="video/*">
+                <button class="btn" onclick="uploadVideo()">Upload Video</button>
+                <div id="error-message" class="error-message hidden"></div>
+                <div id="success-message" class="success-message hidden"></div>
+            </div>
+        </div>
 
-    async function enhance() {
-      const prompt = document.getElementById("promptInput").value.trim();
-      const enhanceBtn = document.getElementById("enhanceBtn");
-      const enhanceStatus = document.getElementById("enhanceStatus");
-      const resultThumb = document.getElementById("resultThumb");
-      
-      if (!selectedFrameUrl) {
-        return showError(enhanceStatus, "Please select a frame first.");
-      }
-      
-      enhanceBtn.disabled = true;
-      enhanceStatus.innerHTML = '<div class="spinner"></div><span class="loading">Enhancing image... This may take a few seconds.</span>';
-      resultThumb.innerHTML = '';
-      
-      try {
-        const res = await fetch("/enhance", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageUrl: selectedFrameUrl, prompt }),
-        });
-        
-        if (!res.ok) {
-          const errorText = await res.text();
-          showError(enhanceStatus, `Enhancement failed: ${errorText}`);
-          enhanceBtn.disabled = false;
-          return;
+        <div id="frames" class="card hidden">
+            <h2><span class="step-number">2</span>Select Frame</h2>
+            <p>Click on one of the frames extracted from your video:</p>
+            <div id="frames-grid"></div>
+        </div>
+
+        <div id="styles" class="card hidden">
+            <h2><span class="step-number">3</span>Choose Style</h2>
+            <div class="styles-grid">
+                <div class="style-option" data-style="race8">
+                    <div class="style-preview race8-preview"></div>
+                    <span>Race 8</span>
+                </div>
+                <div class="style-option" data-style="debut_winner">
+                    <div class="style-preview debut-winner-preview"></div>
+                    <span>Debut Winner</span>
+                </div>
+                <div class="style-option" data-style="simon_marshall">
+                    <div class="style-preview simon-marshall-preview"></div>
+                    <span>Breaking News</span>
+                </div>
+                <div class="style-option" data-style="ten_in_seven">
+                    <div class="style-preview ten-in-seven-preview"></div>
+                    <span>10 in 7 Record</span>
+                </div>
+                <div class="style-option" data-style="odds">
+                    <div class="style-preview odds-preview"></div>
+                    <span>$26 Odds</span>
+                </div>
+                <div class="style-option" data-style="sword">
+                    <div class="style-preview sword-preview"></div>
+                    <span>Put 'Em to the Sword</span>
+                </div>
+                <div class="style-option" data-style="same_game">
+                    <div class="style-preview same-game-preview"></div>
+                    <span>Same Game Multi</span>
+                </div>
+            </div>
+            <button id="enhance-btn" class="btn hidden" onclick="enhance()">Generate Thumbnail</button>
+        </div>
+
+        <div id="result" class="card hidden">
+            <h2><span class="step-number">4</span>Your Thumbnail</h2>
+            <img id="enhanced-image" src="" alt="Enhanced thumbnail">
+            <button class="btn" onclick="downloadImage()">Download Thumbnail</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedFrame = null;
+        let selectedStyle = 'simon_marshall';
+
+        async function uploadVideo() {
+            const fileInput = document.getElementById('video');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            const framesSection = document.getElementById('frames');
+            
+            if (!fileInput.files.length) {
+                showError('Please select a video file first.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const validExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+            const extension = file.name.split('.').pop().toLowerCase();
+            
+            if (!validExtensions.includes(extension)) {
+                showError(`Invalid file type. Please upload a video file (${validExtensions.join(', ')})`);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', file);
+
+            try {
+                showMessage('Uploading video and extracting frames...', false);
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error);
+                }
+
+                const frames = await response.json();
+                
+                // Check if frames is an array
+                if (!Array.isArray(frames)) {
+                    throw new Error('Invalid response from server');
+                }
+                
+                displayFrames(frames);
+                showMessage(`Successfully extracted ${frames.length} frames`, true);
+                framesSection.classList.remove('hidden');
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+        }
+
+        function showMessage(message, isSuccess) {
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            
+            if (isSuccess) {
+                successMessage.textContent = message;
+                successMessage.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+            } else {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('hidden');
+                successMessage.classList.add('hidden');
+            }
+        }
+
+        function displayFrames(frames) {
+            const grid = document.getElementById('frames-grid');
+            grid.innerHTML = '';
+            
+            frames.forEach((frame, index) => {
+                const frameDiv = document.createElement('div');
+                frameDiv.className = 'frame';
+                
+                const img = document.createElement('img');
+                img.src = frame;
+                img.alt = `Frame ${index + 1}`;
+                
+                frameDiv.appendChild(img);
+                frameDiv.onclick = () => selectFrame(frameDiv, frame);
+                grid.appendChild(frameDiv);
+            });
+        }
+
+        function selectFrame(frameDiv, frameUrl) {
+            const allFrames = document.querySelectorAll('.frame');
+            allFrames.forEach(frame => frame.classList.remove('selected'));
+            
+            frameDiv.classList.add('selected');
+            selectedFrame = frameUrl;
+            
+            document.getElementById('styles').classList.remove('hidden');
         }
         
-        const data = await res.json();
+        function selectStyle(styleOption, style) {
+            const allStyles = document.querySelectorAll('.style-option');
+            allStyles.forEach(option => option.classList.remove('selected'));
+            
+            styleOption.classList.add('selected');
+            selectedStyle = style;
+            
+            // Show enhance button
+            document.getElementById('enhance-btn').classList.remove('hidden');
+        }
+
+        async function enhance() {
+            if (!selectedFrame) {
+                showError('Please select a frame first');
+                return;
+            }
+            
+            if (!selectedStyle) {
+                showError('Please select a style first');
+                return;
+            }
+
+            try {
+                showMessage('Generating thumbnail...', false);
+                const response = await fetch('/enhance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        imageUrl: selectedFrame,
+                        style: selectedStyle
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Failed to generate thumbnail');
+                }
+
+                const enhancedImageUrl = await response.text();
+                const enhancedImage = document.getElementById('enhanced-image');
+                enhancedImage.src = enhancedImageUrl;
+                
+                document.getElementById('result').classList.remove('hidden');
+                document.getElementById('error-message').classList.add('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function downloadImage() {
+            const enhancedImage = document.getElementById('enhanced-image');
+            if (!enhancedImage.src) {
+                showError('No thumbnail available to download');
+                return;
+            }
+
+            try {
+                const response = await fetch(enhancedImage.src);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'thumbnail.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                showError('Failed to download image');
+            }
+        }
         
-        const cachedUrl = data.enhanced + '?t=' + new Date().getTime();
-        
-        resultThumb.innerHTML = `
-          <h3>✅ Enhanced Thumbnail</h3>
-          <img src="${cachedUrl}" class="result-image" alt="Enhanced thumbnail" />
-          <div>
-            <a href="${data.enhanced}" download="enhanced_thumbnail.jpg" class="download-link">Download Thumbnail</a>
-          </div>
-        `;
-        
-        showSuccess(enhanceStatus, data.message || "Image enhanced successfully");
-        
-        resultThumb.scrollIntoView({behavior: "smooth"});
-      } catch (error) {
-        console.error("Error enhancing image:", error);
-        showError(enhanceStatus, `Error: ${error.message || "Failed to enhance image"}`);
-      } finally {
-        enhanceBtn.disabled = false;
-      }
-    }
-    
-    function showError(element, message) {
-      element.innerHTML = `<div class="error">${message}</div>`;
-    }
-    
-    function showSuccess(element, message) {
-      element.innerHTML = `<div class="success">${message}</div>`;
-    }
-  </script>
+        // Add event listeners for style options
+        document.addEventListener('DOMContentLoaded', () => {
+            const styleOptions = document.querySelectorAll('.style-option');
+            styleOptions.forEach(option => {
+                const style = option.getAttribute('data-style');
+                option.addEventListener('click', () => selectStyle(option, style));
+            });
+            
+            // Select Simon Marshall style by default
+            const defaultStyle = document.querySelector('[data-style="simon_marshall"]');
+            if (defaultStyle) {
+                defaultStyle.classList.add('selected');
+            }
+        });
+    </script>
 </body>
 </html>
